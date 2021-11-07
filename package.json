@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "json-server": "json-server data/podcast.json --port 9000"
+    "json-server": "json-server data/database.json --port 9000"
   },
   "dependencies": {
     "next": "12.0.3",

@@ -60,6 +60,7 @@ export async function getStaticProps(context) {
     const podcastDescription = data.rss.channel[0].description[0];
 
     // get the list of podcasts
+    // TODO: replace this with fetch to json-server
     const episodes = data.rss.channel[0].item;
 
     // create the array of episode objects
