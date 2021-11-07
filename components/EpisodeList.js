@@ -20,19 +20,19 @@ function EpisodeDetails({ episodeTitle, episodeDescription, pubDate, link }) {
   );
 }
 
-export default function EpisodeList({ episodeList }) {
+export default function EpisodeList({ episodeList, start = 0, len }) {
   return (
     <ol>
-      {episodeList.map(
-        ({ episodeTitle, episodeDescription, pubDate, link }) => (
+      {episodeList
+        .slice(start, len)
+        .map(({ episodeTitle, episodeDescription, pubDate, link }) => (
           <EpisodeDetails
             episodeTitle={episodeTitle}
             episodeDescription={episodeDescription}
             pubDate={pubDate}
             link={link}
           />
-        )
-      )}
+        ))}
     </ol>
   );
 }

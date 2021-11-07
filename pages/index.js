@@ -12,6 +12,8 @@ import { readFileSync } from "fs";
 // Index page should show the list of all the available podcast episodes
 // Each link will lead to the page about the episode
 
+// TODO: Add pagination so that not all of the episodes are shown at once.
+
 export default function Home({
   numEpisodes,
   episodeList,
