@@ -1,8 +1,8 @@
-import { parseString } from "xml2js";
+const { parseString } = require("xml2js");
 
 // wrap the node style callback in a promise to make it easier to use with async/await
 
-export default function readXml(xmlData) {
+function readXml(xmlData) {
   return new Promise((resolve, reject) => {
     parseString(xmlData, (err, result) => {
       if (err) {
@@ -13,3 +13,5 @@ export default function readXml(xmlData) {
     });
   });
 }
+
+module.exports = readXml;
