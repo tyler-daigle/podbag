@@ -8,7 +8,8 @@
       "podcastImage" : {
         "fileName" : "uuid-asdf-asd.jpg",
         "imageLink" : "https://asdfasdf"
-      }
+      },
+      "numEpisodes" : 123
     },
     "episodes" : [
       {
@@ -58,6 +59,8 @@ async function rssToJson(rssFile) {
       imageLink: podcastImageLink,
     };
 
+    podcastDetails.numEpisodes = podcastEpisodes.length;
+
     // get all the episodes now
 
     const episodes = [];
@@ -84,6 +87,7 @@ async function rssToJson(rssFile) {
     });
 
     console.log(JSON.stringify({ podcastDetails, episodes }));
+    console.log(podcastEpisodes.length);
   } catch (e) {
     console.log(e);
   }

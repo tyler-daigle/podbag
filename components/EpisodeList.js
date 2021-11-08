@@ -1,10 +1,17 @@
 import { useState } from "react";
 import styles from "../styles/EpisodeList.module.css";
 
-function EpisodeDetails({ episodeTitle, episodeDescription, pubDate, link }) {
+function EpisodeDetails({
+  episodeId,
+  episodeTitle,
+  episodeDescription,
+  pubDate,
+  link,
+}) {
   const [descVisible, setDescVisible] = useState(false);
   return (
     <li
+      key={episodeId}
       className={styles.episodeList}
       onClick={() => setDescVisible(!descVisible)}
     >
@@ -25,14 +32,23 @@ export default function EpisodeList({ episodeList, start = 0, len }) {
     <ol>
       {episodeList
         .slice(start, len)
-        .map(({ episodeTitle, episodeDescription, pubDate, link }) => (
-          <EpisodeDetails
-            episodeTitle={episodeTitle}
-            episodeDescription={episodeDescription}
-            pubDate={pubDate}
-            link={link}
-          />
-        ))}
+        .map(
+          ({
+            id,
+            episodeTitle,
+            episodeDescription,
+            episodePubDate,
+            episodeLink,
+          }) => (
+            <EpisodeDetails
+              episodeId={id}
+              episodeTitle={episodeTitle}
+              episodeDescription={episodeDescription}
+              pubDate={episodePubDate}
+              link={episodeLink}
+            />
+          )
+        )}
     </ol>
   );
 }

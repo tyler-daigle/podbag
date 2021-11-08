@@ -6,13 +6,15 @@ import EpisodeList from "../components/EpisodeList";
 
 import { useEffect, useState } from "react";
 
-import readXml from "../util/readxml";
-import { readFileSync } from "fs";
+import { podcastDbHost } from "../config";
 
 // Index page should show the list of all the available podcast episodes
 // Each link will lead to the page about the episode
 
 // TODO: Add pagination so that not all of the episodes are shown at once.
+
+// initial number of episodes to display when page is first loaded
+const numEpisodesToFetch = 25;
 
 export default function Home({
   numEpisodes,
@@ -22,19 +24,57 @@ export default function Home({
 }) {
   const [currentEpisodeList, setCurrentEpisodeList] = useState(episodeList);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [moreData, setMoreData] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false);
 
   // very simple text search for searching through the episode titles
-  useEffect(() => {
-    const eps = episodeList.filter((episode) =>
-      episode.episodeTitle.includes(searchTerm)
-    );
+  useEffect(async () => {
+    let res;
+    let eps;
+
+    // TODO: debounce the request
+    if (searchTerm === "") {
+      // reset the episode list
+      res = await fetch(
+        `${podcastDbHost}/episodes?_limit=${currentPage * numEpisodesToFetch}`
+      );
+    } else {
+      res = await fetch(`${podcastDbHost}/episodes?q=${searchTerm}`);
+    }
+    eps = await res.json();
     setCurrentEpisodeList(eps);
   }, [searchTerm]);
 
+  useEffect(() => {
+    if (currentEpisodeList.length >= numEpisodes) {
+      setMoreData(false);
+    }
+  }, [currentEpisodeList]);
   const onSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
+  const loadMore = async () => {
+    // fetch the next page of episodes and append it to the
+    // previous currentEpisodeList
+
+    setDataLoading(true);
+
+    // TODO: remove fake loading delay
+    setTimeout(async () => {
+      const res = await fetch(
+        `${podcastDbHost}/episodes?_page=${currentPage}&_limit=${numEpisodesToFetch}`
+      );
+
+      const moreEpisodes = await res.json();
+
+      const eps = [...currentEpisodeList, ...moreEpisodes];
+      setCurrentEpisodeList(eps);
+      setCurrentPage(currentPage + 1);
+      setDataLoading(false);
+    }, 500);
+  };
   return (
     <div>
       <Head>
@@ -45,31 +85,53 @@ export default function Home({
       <p>Number of Episodes: {numEpisodes}</p>
       <input type="text" value={searchTerm} onChange={onSearchChange} />
       <EpisodeList episodeList={currentEpisodeList} />
+      {dataLoading ? (
+        <span>Loading...</span>
+      ) : (
+        <button type="button" onClick={loadMore}>
+          {moreData ? "Load More" : "All Done"}
+        </button>
+      )}
     </div>
   );
 }
 
-export async function getStaticProps(context) {
-  const feedFile = "./data/feed.rss";
+async function getPodcastDetails() {
   try {
-    // open the rss file and parse it
-    const rssData = readFileSync(feedFile, "utf-8");
-    const data = await readXml(rssData);
+    const res = await fetch(`${podcastDbHost}/podcastDetails`);
+    const { podcastTitle, podcastDescription, numEpisodes } = await res.json();
 
-    const podcastTitle = data.rss.channel[0].title[0];
-    const podcastDescription = data.rss.channel[0].description[0];
+    return {
+      podcastTitle,
+      podcastDescription,
+      numEpisodes,
+    };
+  } catch (e) {
+    console.log(e);
+  }
+}
 
-    // get the list of podcasts
-    // TODO: replace this with fetch to json-server
-    const episodes = data.rss.channel[0].item;
+export async function getStaticProps(context) {
+  try {
+    // get the podcast details
+    const { podcastTitle, podcastDescription, numEpisodes } =
+      await getPodcastDetails();
+
+    const host = podcastDbHost;
+
+    const res = await fetch(`${host}/episodes?_limit=${numEpisodesToFetch}`);
+    const episodes = await res.json();
 
     // create the array of episode objects
     const episodeList = episodes.map((episode) => {
+      const { episodeTitle, episodeDescription, episodePubDate, episodeLink } =
+        episode;
       return {
-        episodeTitle: episode.title[0],
-        episodeDescription: episode.description[0],
-        pubDate: episode.pubDate[0],
-        link: episode.link[0],
+        episodeTitle,
+        episodeDescription,
+        episodePubDate,
+        link: episodeLink,
+        id: episode.id,
       };
     });
 
@@ -77,7 +139,7 @@ export async function getStaticProps(context) {
 
     return {
       props: {
-        numEpisodes: episodes.length,
+        numEpisodes,
         episodeList,
         podcastTitle,
         podcastDescription,
