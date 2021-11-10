@@ -1,3 +1,51 @@
+.episodeListContainer {
+  background-color: black;
+  padding: 1rem;
+}
 .episodeList {
-  cursor: pointer;
+  list-style-type: none;
+  padding: 0;
+}
+
+.episodeListItem {
+  /* cursor: pointer; */
+  margin: 1rem 0;
+  display: flex;
+  gap: 1rem;
+}
+.episodeListItem:hover {
+  background-color: #161727;
+}
+
+.episodeDetails {
+  color: #8d8888;
+  border-bottom: solid 1px #8d8888;
+}
+
+.episodeDetails p {
+  font-size: 0.85rem;
+  line-height: 1.2rem;
+}
+
+.episodeTitle {
+  color: white;
+}
+
+.showLink {
+  color: white;
+  font-weight: bold;
+}
+
+.showLink:visited {
+  color: white;
+}
+
+.publishedDate {
+  color: white;
+}
+
+.placeHolderImage {
+  height: 100px;
+  min-width: 100px;
+  background-color: gray;
 }

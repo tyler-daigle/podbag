@@ -80,10 +80,25 @@ export default function Home({
       <Head>
         <title>Index Page</title>
       </Head>
-      <h1>{podcastTitle}</h1>
-      <p>{podcastDescription}</p>
-      <p>Number of Episodes: {numEpisodes}</p>
-      <input type="text" value={searchTerm} onChange={onSearchChange} />
+      <div className={styles.podcastDetailsContainer}>
+        <img className={styles.largePlaceHolder} />
+        <div>
+          <h1 className={styles.podcastTitle}>{podcastTitle}</h1>
+          <p className={styles.podcastDescription}>{podcastDescription}</p>
+          <p className={styles.episodeCount}>
+            Number of Episodes: {numEpisodes}
+          </p>
+        </div>
+      </div>
+      <div className={styles.searchBarContainer}>
+        <input
+          className={styles.searchBar}
+          type="text"
+          value={searchTerm}
+          onChange={onSearchChange}
+          placeholder="Search Episodes"
+        />
+      </div>
       <EpisodeList episodeList={currentEpisodeList} />
       {dataLoading ? (
         <span>Loading...</span>
